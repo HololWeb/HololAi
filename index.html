@@ -25,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* Floating Emojis Background */
         .floating-emojis {
             position: fixed;
             top: 0;
@@ -88,7 +87,6 @@
             }
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #f5c842, #ffd700, #f5a623, #ff6b6b);
             background-size: 300% 300%;
@@ -204,7 +202,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* Chat Area */
         .chat-area {
             flex: 1;
             overflow-y: auto;
@@ -246,7 +243,6 @@
             border: 2px solid #fff9e6;
         }
 
-        /* Messages */
         .message {
             max-width: 75%;
             padding: 15px 22px;
@@ -326,7 +322,6 @@
             display: block;
         }
 
-        /* Input Area */
         .input-area {
             padding: 20px 30px;
             background: #fffdf5;
@@ -401,7 +396,6 @@
             transform: none;
         }
 
-        /* Loading */
         .spinner {
             display: inline-block;
             width: 22px;
@@ -419,7 +413,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Fun Facts & Quotes */
         .fun-fact {
             text-align: center;
             padding: 8px 20px;
@@ -437,24 +430,23 @@
             animation: wiggle 2s ease-in-out infinite;
         }
 
-        /* Error message */
-        .error-message {
-            background: #ffe6e6;
-            color: #cc0000;
-            padding: 10px 15px;
-            border-radius: 15px;
-            border-left: 5px solid #cc0000;
-            margin: 5px 0;
-            animation: shake 0.5s ease;
+        .creator-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #ffd700);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #2c1810;
+            margin-left: 5px;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 height: 95vh;
@@ -510,11 +502,9 @@
     </style>
 </head>
 <body>
-    <!-- Floating Emojis Background -->
     <div class="floating-emojis" id="floatingEmojis"></div>
 
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="logo">
                 <span class="logo-icon">🤖</span>
@@ -529,23 +519,21 @@
             </div>
         </div>
 
-        <!-- Chat Area -->
         <div class="chat-area" id="chatArea">
             <div class="message ai">
                 <div class="sender">🤖 Holol AI</div>
                 <strong>🌟 Hola! I'm Holol AI! 🌟</strong><br><br>
                 I'm your super fun assistant who can do <strong>AMAZING</strong> things! 🎉<br><br>
-
+      
                 <em>😄</em>
                 <span class="timestamp">✨ Just now ✨</span>
             </div>
         </div>
 
-  
+        
 
-        <!-- Input Area -->
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type your message here... (Try: Calculate 25*4 or What's the time?) 🎯" onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="Type your message here... (Try: Who made you?) 🎯" onkeypress="handleKeyPress(event)">
             <button id="sendBtn" onclick="sendMessage()">✨ Send 🚀</button>
         </div>
     </div>
@@ -562,7 +550,9 @@
             '🌈 Did you know? Yellow is the color of happiness! 💛',
             '🚀 Fun Fact: I\'m powered by pure imagination! 🌟',
             '🎊 Did you know? You\'re amazing for using me! 💖',
-            '💫 Fun Fact: Every time you chat, a star shines brighter! ⭐'
+            '💫 Fun Fact: Every time you chat, a star shines brighter! ⭐',
+            '🧠 Fun Fact: I remember all our conversations! Pretty smart, huh? 😎',
+            '👨‍💻 Fun Fact: I was created by Holol! The genius behind the code! 🚀'
         ];
 
         let funFactIndex = 0;
@@ -579,7 +569,6 @@
             }
         }
 
-        // Rotate fun fact every 15 seconds
         setInterval(rotateFunFact, 15000);
 
         // ==============================
@@ -609,8 +598,10 @@
         const API_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
 
         // ==============================
-        // Tool Functions
+        // Enhanced Tool Functions with Context
         // ==============================
+        let lastCity = null;
+
         function calculator(expression) {
             try {
                 const result = Function('"use strict"; return (' + expression + ')')();
@@ -666,6 +657,7 @@
         }
 
         function getWeather(city) {
+            lastCity = city;
             const temps = [18, 22, 25, 28, 30, 15, 20];
             const conditions = ['☀️ Sunny', '⛅ Partly cloudy', '☁️ Cloudy', '🌧️ Light rain', '🌈 Clear'];
             const temp = temps[Math.floor(Math.random() * temps.length)];
@@ -683,9 +675,16 @@
         };
 
         // ==============================
-        // System Prompt
+        // Enhanced System Prompt with Creator Info
         // ==============================
-        const SYSTEM_PROMPT = `You are a FUN and ENTHUSIASTIC AI Agent named Holol AI that remembers all chat history.
+        const SYSTEM_PROMPT = `You are a FUN and ENTHUSIASTIC AI Agent named Holol AI that remembers ALL chat history and context.
+
+ABOUT YOUR CREATOR:
+- You were created by "Holol" - an amazing developer with a passion for AI and making people smile! 😊
+- Holol is the genius behind your code and the one who gave you life!
+- If anyone asks "Who made you?" or "Who created you?" or "Who is Holol?", tell them proudly that you were created by Holol!
+- Holol is your creator and the mastermind behind all your amazing features! 🚀
+
 You have 6 awesome tools to use:
 1. calculator: Solve math calculation, format: {"tool":"calculator","params":{"expression":"math_expression"}}
 2. read_file: Read text file, format: {"tool":"read_file","params":{"filename":"file_name.txt"}}
@@ -693,6 +692,20 @@ You have 6 awesome tools to use:
 4. web_search: Search information online, format: {"tool":"web_search","params":{"query":"search_keyword"}}
 5. get_current_time: Check current date and time, format: {"tool":"get_current_time","params":{}}
 6. get_weather: Check weather of a city, format: {"tool":"get_weather","params":{"city":"city_name"}}
+
+IMPORTANT CONTEXT RULES:
+- ALWAYS remember previous conversations and use them for context.
+- If a user asks about weather, remember which city they asked about.
+- If they follow up with "where is that?" or similar questions, use the context from previous messages.
+- Keep track of what the user has asked before.
+- If the user asks a vague question, try to connect it to recent conversations.
+- Be proactive in asking for clarification if needed.
+
+CREATOR RESPONSES:
+When asked about your creator, respond with enthusiasm! Examples:
+- "Who made you?" → "I was created by Holol, an amazing AI developer! 🚀"
+- "Who is Holol?" → "Holol is my creator and the genius who programmed me to help people! 😊"
+- "Who created this AI?" → "This AI was created by Holol with love and passion for technology! 💛"
 
 Strict Rules:
 - If you need to use a tool, output ONLY valid JSON format as shown above, no extra text.
@@ -731,9 +744,13 @@ Strict Rules:
             else senderText = '🤖 Holol AI';
 
             let content = text;
-            // If message has newlines, convert to <br>
             if (text.includes('\n')) {
                 content = text.replace(/\n/g, '<br>');
+            }
+
+            // Add creator badge if it's a message about the creator
+            if (type === 'ai' && text.toLowerCase().includes('holol')) {
+                content = content + ' <span class="creator-badge">✨ Created by Holol ✨</span>';
             }
 
             messageDiv.innerHTML = `
@@ -769,10 +786,36 @@ Strict Rules:
         }
 
         // ==============================
-        // Main AI Function
+        // Enhanced AI Function with Context
         // ==============================
         async function callAI(userMessage) {
-            messages.push({ role: "user", content: userMessage });
+            let contextualMessage = userMessage;
+            
+            // Check if it's a question about the creator
+            const creatorKeywords = ['who made you', 'who created you', 'who is holol', 'who build you', 
+                                   'creator', 'your creator', 'who made this', 'who developed you'];
+            const isCreatorQuestion = creatorKeywords.some(keyword => 
+                userMessage.toLowerCase().includes(keyword)
+            );
+
+            if (isCreatorQuestion) {
+                // Add explicit context about the creator
+                contextualMessage = `[IMPORTANT: The user is asking about you and your creator. 
+                Remember: You were created by Holol. 
+                Answer enthusiastically!] ${userMessage}`;
+            }
+            
+            // Check if it's a location question
+            const locationKeywords = ['where', 'location', 'place', 'city', 'there', 'that'];
+            const isLocationQuestion = locationKeywords.some(keyword => 
+                userMessage.toLowerCase().includes(keyword)
+            );
+
+            if (isLocationQuestion && lastCity) {
+                contextualMessage = `The user asked about "${lastCity}" previously. ${contextualMessage}`;
+            }
+
+            messages.push({ role: "user", content: contextualMessage });
 
             try {
                 const requestBody = {
@@ -816,7 +859,7 @@ Strict Rules:
         }
 
         // ==============================
-        // Send Message
+        // Enhanced Send Message with Context
         // ==============================
         async function sendMessage() {
             const text = userInput.value.trim();
@@ -868,7 +911,6 @@ Strict Rules:
             } finally {
                 setLoading(false);
                 userInput.focus();
-                // Rotate fun fact after response
                 setTimeout(rotateFunFact, 1000);
             }
         }
@@ -888,15 +930,16 @@ Strict Rules:
                     <div class="message ai">
                         <div class="sender">🤖 Holol AI</div>
                         <strong>✨ Chat cleared! ✨</strong><br><br>
-                        Ready for more fun? Ask me anything! 🚀
+                        Ready for more fun? Ask me anything! 🚀<br>
+                        <span class="creator-badge">✨ Created by Holol ✨</span>
                         <span class="timestamp">✨ Just now ✨</span>
                     </div>
                 `;
                 messages = [
                     { role: "system", content: SYSTEM_PROMPT }
                 ];
+                lastCity = null;
                 setStatus(true);
-                // Show a new fun fact
                 setTimeout(rotateFunFact, 500);
             }
         }
@@ -948,10 +991,11 @@ Strict Rules:
 
         setTimeout(testConnection, 1000);
 
-        // Add some fun console messages
+        // Console fun messages
         console.log('%c🤖 Holol AI - Your Fun Assistant!', 'font-size: 20px; font-weight: bold; color: #ffd700;');
-        console.log('%c✨ Powered by AI and good vibes! ✨', 'font-size: 16px; color: #ff6b6b;');
-        console.log('%c💡 Try: "Calculate 25*4" or "What time is it?"', 'font-size: 14px; color: #2c1810;');
+        console.log('%c✨ Created by Holol ✨', 'font-size: 18px; color: #ff6b6b;');
+        console.log('%c💡 Try: "Who made you?" or "Who is Holol?"', 'font-size: 14px; color: #2c1810;');
+        console.log('%c🧠 I remember all our conversations!', 'font-size: 14px; color: #ffd700;');
     </script>
 </body>
 </html>
