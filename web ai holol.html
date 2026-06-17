@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holol AI - Your Intelligent Assistant</title>
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffd700 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffd700;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #f5c842, #ffd700, #f5a623);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #e6a800;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .logo h1 {
+            color: #2c1810;
+            font-size: 2rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .logo h1 span {
+            color: #fff;
+            background: #2c1810;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 1rem;
+            margin-left: 8px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2c1810;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2c1810;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #fffdf5;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-area::-webkit-scrollbar-track {
+            background: #fff9e6;
+        }
+
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 10px;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 75%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            animation: slideIn 0.3s ease-out;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #ffd700, #f5c842);
+            color: #2c1810;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: #fff;
+            color: #2c1810;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ffd700;
+        }
+
+        .message.tool {
+            align-self: center;
+            background: #f5f0e1;
+            color: #5a4a2a;
+            font-size: 0.9rem;
+            padding: 10px 18px;
+            border-radius: 12px;
+            max-width: 85%;
+            border-left: 4px solid #ffd700;
+            font-style: italic;
+        }
+
+        .message .sender {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .message .timestamp {
+            font-size: 0.7rem;
+            opacity: 0.5;
+            margin-top: 5px;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px 30px;
+            background: #fffdf5;
+            border-top: 2px solid #ffd700;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #ffd700;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            background: #fff;
+            color: #2c1810;
+        }
+
+        .input-area input:focus {
+            border-color: #f5a623;
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.2);
+        }
+
+        .input-area input::placeholder {
+            color: #b8a080;
+        }
+
+        .input-area button {
+            padding: 14px 35px;
+            background: linear-gradient(135deg, #ffd700, #f5a623);
+            border: none;
+            border-radius: 25px;
+            font-weight: 700;
+            color: #2c1810;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .input-area button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .input-area button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .input-area button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Tool Badges */
+        .tool-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px 30px;
+            background: #fff9e6;
+            border-top: 1px solid #ffeaa7;
+            flex-shrink: 0;
+        }
+
+        .tool-badge {
+            background: #ffd700;
+            padding: 5px 14px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2c1810;
+            cursor: default;
+            transition: all 0.3s;
+            border: 1px solid #e6a800;
+        }
+
+        .tool-badge:hover {
+            transform: scale(1.05);
+            background: #f5c842;
+        }
+
+        /* Loading Spinner in button */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(44, 24, 16, 0.1);
+            border-top: 3px solid #2c1810;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                height: 95vh;
+                border-radius: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-controls {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .input-area {
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .input-area button {
+                width: 100%;
+            }
+
+            .tool-badges {
+                padding: 8px 15px;
+                justify-content: center;
+            }
+
+            .chat-area {
+                padding: 15px;
+            }
+        }
+
+        /* Error message */
+        .error-message {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border-left: 4px solid #cc0000;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <h1>Holol AI <span>v2.0</span></h1>
+            </div>
+            <div class="header-controls">
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Online</span>
+                </div>
+                <button class="btn-clear" onclick="clearChat()">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <!-- Tool Badges -->
+        <div class="tool-badges">
+            <span class="tool-badge">🧮 Calculator</span>
+            <span class="tool-badge">📂 Read File</span>
+            <span class="tool-badge">✍️ Write File</span>
+            <span class="tool-badge">🌐 Web Search</span>
+            <span class="tool-badge">⏰ Time</span>
+            <span class="tool-badge">🌦️ Weather</span>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea">
+            <div class="message ai">
+                <div class="sender">🤖 Holol AI</div>
+                Hello! I'm Holol AI, your intelligent assistant. I can help you with:
+                <br>• Calculations 📐
+                <br>• File operations 📁
+                <br>• Web searches 🌐
+                <br>• Time & Weather ⏰
+                <br><br>Just ask me anything!
+                <div class="timestamp">Just now</div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+            <button id="sendBtn" onclick="sendMessage()">Send ✨</button>
+        </div>
+    </div>
+
+    <script>
+        // ==============================
+        // API Configuration
+        // ==============================
+        const API_KEY = "sk-e91ee7422b9b4b59820160b975bec0ce";
+        const API_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
+
+        // ==============================
+        // Tool Functions (Client-side simulation for demo)
+        // ==============================
+        function calculator(expression) {
+            try {
+                // Safe evaluation
+                const result = Function('"use strict"; return (' + expression + ')')();
+                return `Calculator result: ${expression} = ${result}`;
+            } catch {
+                return "Calculation failed";
+            }
+        }
+
+        function readFile(filename) {
+            // In browser, we'll use localStorage for demo
+            try {
+                const content = localStorage.getItem(`file_${filename}`);
+                if (content) {
+                    return `File content: ${content}`;
+                } else {
+                    return "File not found or cannot be read";
+                }
+            } catch {
+                return "File not found or cannot be read";
+            }
+        }
+
+        function writeFile(filename, content) {
+            try {
+                localStorage.setItem(`file_${filename}`, content);
+                return `Successfully written to file: ${filename}`;
+            } catch {
+                return "Failed to write file";
+            }
+        }
+
+        function webSearch(query) {
+            // Simulated web search
+            const mockResults = [
+                `- ${query} - Wikipedia: ${query} is a topic of interest...`,
+                `- ${query} - News: Recent developments in ${query}...`,
+                `- ${query} - Research: Studies about ${query}...`
+            ];
+            return `Web search result for "${query}":\n${mockResults.join('\n')}`;
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            const currentTime = now.toLocaleString('en-US', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            return `Current time: ${currentTime}`;
+        }
+
+        function getWeather(city) {
+            // Simulated weather
+            const temps = [18, 22, 25, 28, 30, 15, 20];
+            const conditions = ['Sunny', 'Partly cloudy', 'Cloudy', 'Light rain', 'Clear'];
+            const temp = temps[Math.floor(Math.random() * temps.length)];
+            const condition = conditions[Math.floor(Math.random() * conditions.length)];
+            return `Weather in ${city}: ${temp}°C, ${condition}`;
+        }
+
+        const tools = {
+            calculator: calculator,
+            read_file: readFile,
+            write_file: writeFile,
+            web_search: webSearch,
+            get_current_time: getCurrentTime,
+            get_weather: getWeather
+        };
+
+        // ==============================
+        // System Prompt
+        // ==============================
+        const SYSTEM_PROMPT = `You are an AI Agent that remembers all chat history.
+You have 6 available tools to use:
+1. calculator: Solve math calculation, format: {"tool":"calculator","params":{"expression":"math_expression"}}
+2. read_file: Read text file, format: {"tool":"read_file","params":{"filename":"file_name.txt"}}
+3. write_file: Write content to text file, format: {"tool":"write_file","params":{"filename":"file_name.txt","content":"your_text"}}
+4. web_search: Search information online, format: {"tool":"web_search","params":{"query":"search_keyword"}}
+5. get_current_time: Check current date and time, format: {"tool":"get_current_time","params":{}}
+6. get_weather: Check weather of a city, format: {"tool":"get_weather","params":{"city":"city_name"}}
+
+Strict Rules:
+- If you need to use a tool, output ONLY valid JSON format as shown above, no extra text.
+- If you do NOT need any tool, answer directly in natural English.
+- Always remember all previous conversation with the user.
+- Use English for all your replies.`;
+
+        // ==============================
+        // Chat State
+        // ==============================
+        let messages = [
+            { role: "system", content: SYSTEM_PROMPT }
+        ];
+
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        // ==============================
+        // UI Functions
+        // ==============================
+        function addMessage(text, type, toolResult = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const timestamp = new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            if (type === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="sender">👤 You</div>
+                    ${text}
+                    <div class="timestamp">${timestamp}</div>
+                `;
+            } else if (type === 'tool') {
+                messageDiv.innerHTML = `
+                    <div class="sender">⚙️ Tool</div>
+                    ${text.replace(/\n/g, '<br>')}
+                    <div class="timestamp">${timestamp}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="sender">🤖 Holol AI</div>
+                    ${text.replace(/\n/g, '<br>')}
+                    <div class="timestamp">${timestamp}</div>
+                `;
+            }
+
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function setStatus(online) {
+            if (online) {
+                statusDot.style.background = '#4caf50';
+                statusText.textContent = 'Online';
+            } else {
+                statusDot.style.background = '#ff6b6b';
+                statusText.textContent = 'Offline';
+            }
+        }
+
+        function setLoading(loading) {
+            sendBtn.disabled = loading;
+            userInput.disabled = loading;
+            if (loading) {
+                sendBtn.innerHTML = '<span class="spinner"></span> Thinking...';
+            } else {
+                sendBtn.innerHTML = 'Send ✨';
+            }
+        }
+
+        // ==============================
+        // Main AI Function
+        // ==============================
+        async function callAI(userMessage) {
+            // Add user message to history
+            messages.push({ role: "user", content: userMessage });
+
+            try {
+                // Prepare request
+                const requestBody = {
+                    model: "qwen-turbo",
+                    input: {
+                        messages: messages
+                    },
+                    parameters: {
+                        result_format: "message",
+                        temperature: 0.7,
+                        top_p: 0.9,
+                        max_tokens: 1500
+                    }
+                };
+
+                // Call API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.output && data.output.choices && data.output.choices.length > 0) {
+                    const reply = data.output.choices[0].message.content.trim();
+                    return reply;
+                } else {
+                    throw new Error('Invalid API response');
+                }
+
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // ==============================
+        // Send Message
+        // ==============================
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Add user message to UI
+            addMessage(text, 'user');
+            userInput.value = '';
+            setLoading(true);
+            setStatus(false);
+
+            try {
+                // Get AI response
+                const reply = await callAI(text);
+
+                // Check if reply is a tool call
+                if (reply.startsWith('{') && reply.endsWith('}')) {
+                    try {
+                        const toolData = JSON.parse(reply);
+                        const toolName = toolData.tool;
+                        const toolParams = toolData.params || {};
+
+                        if (toolName in tools) {
+                            // Execute tool
+                            const toolResult = tools[toolName](...Object.values(toolParams));
+                            
+                            // Add tool result to UI
+                            addMessage(toolResult, 'tool');
+                            
+                            // Add tool interaction to history
+                            messages.push({ role: "assistant", content: reply });
+                            messages.push({ role: "user", content: toolResult });
+
+                            // Get final response after tool
+                            const finalReply = await callAI(toolResult);
+                            addMessage(finalReply, 'ai');
+                            messages.push({ role: "assistant", content: finalReply });
+                        } else {
+                            addMessage(`Unknown tool: ${toolName}`, 'ai');
+                            messages.push({ role: "assistant", content: reply });
+                        }
+                    } catch (e) {
+                        // If JSON parsing fails, treat as normal reply
+                        addMessage(reply, 'ai');
+                        messages.push({ role: "assistant", content: reply });
+                    }
+                } else {
+                    // Normal AI response
+                    addMessage(reply, 'ai');
+                    messages.push({ role: "assistant", content: reply });
+                }
+
+                setStatus(true);
+
+            } catch (error) {
+                const errorMsg = `❌ Error: ${error.message || 'Failed to connect to AI'}`;
+                addMessage(errorMsg, 'ai');
+                setStatus(false);
+            } finally {
+                setLoading(false);
+                userInput.focus();
+            }
+        }
+
+        // ==============================
+        // Event Handlers
+        // ==============================
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function clearChat() {
+            if (confirm('Clear all messages?')) {
+                chatArea.innerHTML = `
+                    <div class="message ai">
+                        <div class="sender">🤖 Holol AI</div>
+                        Chat cleared. How can I help you today?
+                        <div class="timestamp">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                `;
+                // Reset messages history
+                messages = [
+                    { role: "system", content: SYSTEM_PROMPT }
+                ];
+                setStatus(true);
+            }
+        }
+
+        // ==============================
+        // Initialize
+        // ==============================
+        userInput.focus();
+        setStatus(true);
+
+        // ==============================
+        // Test API Connection on Load
+        // ==============================
+        async function testConnection() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "qwen-turbo",
+                        input: {
+                            messages: [
+                                { role: "system", content: "You are a helpful assistant." },
+                                { role: "user", content: "Hello" }
+                            ]
+                        },
+                        parameters: {
+                            result_format: "message",
+                            max_tokens: 10
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    setStatus(true);
+                    console.log('✅ API Connected successfully');
+                } else {
+                    setStatus(false);
+                    console.warn('⚠️ API Connection failed');
+                }
+            } catch (e) {
+                setStatus(false);
+                console.warn('⚠️ API Connection error:', e);
+            }
+        }
+
+        // Test connection on load
+        setTimeout(testConnection, 1000);
+    </script>
+</body>
+</html>
