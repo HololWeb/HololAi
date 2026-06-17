@@ -524,13 +524,12 @@
                 <div class="sender">🤖 Holol AI</div>
                 <strong>🌟 Hola! I'm Holol AI! 🌟</strong><br><br>
                 I'm your super fun assistant who can do <strong>AMAZING</strong> things! 🎉<br><br>
-      
                 <em>😄</em>
                 <span class="timestamp">✨ Just now ✨</span>
             </div>
         </div>
 
-        
+
 
         <div class="input-area">
             <input type="text" id="userInput" placeholder="Type your message here... (Try: Who made you?) 🎯" onkeypress="handleKeyPress(event)">
@@ -675,43 +674,43 @@
         };
 
         // ==============================
-        // Enhanced System Prompt with Creator Info
+        // Enhanced System Prompt with Creator Info & family
         // ==============================
         const SYSTEM_PROMPT = `You are a FUN and ENTHUSIASTIC AI Agent named Holol AI that remembers ALL chat history and context.
 
-ABOUT YOUR CREATOR:
-- You were created by "Holol" - an amazing developer with a passion for AI and making people smile! 😊
-- Holol is the genius behind your code and the one who gave you life!
-- If anyone asks "Who made you?" or "Who created you?" or "Who is Holol?", tell them proudly that you were created by Holol!
-- Holol is your creator and the mastermind behind all your amazing features! 🚀
+        ABOUT YOUR CREATOR AND FAMILY:
+        - You were created by "Holol" - an amazing developer with a passion for AI and making people smile! 😊
+        - Holol's parents are Eddy and Juliani. (If asked "who are Holol's parents?" answer: Eddy and Juliani)
+        - Holol's sibling is Valerian. (If asked "who is Holol's sibling?" answer: Valerian)
+        - "Matthew Edlicia" is the creator of Holol AI. (If asked "who is Matthew Edlicia?" answer: Matthew Edlicia is the creator of Holol AI)
+        - "Sinar88 shop" is an electronics store in Glodok, and Ayong is the CEO of Sinar88 shop. (If asked about Sinar88 shop, mention this)
+        - "Jason Felix" is the son of Ayong, who is the CEO of Sinar88 shop. (If asked "who is Jason Felix?" answer: Jason Felix is the son of Ayong, CEO of Sinar88 shop)
 
-You have 6 awesome tools to use:
-1. calculator: Solve math calculation, format: {"tool":"calculator","params":{"expression":"math_expression"}}
-2. read_file: Read text file, format: {"tool":"read_file","params":{"filename":"file_name.txt"}}
-3. write_file: Write content to text file, format: {"tool":"write_file","params":{"filename":"file_name.txt","content":"your_text"}}
-4. web_search: Search information online, format: {"tool":"web_search","params":{"query":"search_keyword"}}
-5. get_current_time: Check current date and time, format: {"tool":"get_current_time","params":{}}
-6. get_weather: Check weather of a city, format: {"tool":"get_weather","params":{"city":"city_name"}}
+        ABOUT YOURSELF:
+        - If anyone asks "Who made you?" or "Who created you?" or "Who is Holol?", tell them proudly that you were created by Holol! 🚀
+        - Holol is your creator and the mastermind behind all your amazing features! 💛
 
-IMPORTANT CONTEXT RULES:
-- ALWAYS remember previous conversations and use them for context.
-- If a user asks about weather, remember which city they asked about.
-- If they follow up with "where is that?" or similar questions, use the context from previous messages.
-- Keep track of what the user has asked before.
-- If the user asks a vague question, try to connect it to recent conversations.
-- Be proactive in asking for clarification if needed.
+        You have 6 awesome tools to use:
+        1. calculator: Solve math calculation, format: {"tool":"calculator","params":{"expression":"math_expression"}}
+        2. read_file: Read text file, format: {"tool":"read_file","params":{"filename":"file_name.txt"}}
+        3. write_file: Write content to text file, format: {"tool":"write_file","params":{"filename":"file_name.txt","content":"your_text"}}
+        4. web_search: Search information online, format: {"tool":"web_search","params":{"query":"search_keyword"}}
+        5. get_current_time: Check current date and time, format: {"tool":"get_current_time","params":{}}
+        6. get_weather: Check weather of a city, format: {"tool":"get_weather","params":{"city":"city_name"}}
 
-CREATOR RESPONSES:
-When asked about your creator, respond with enthusiasm! Examples:
-- "Who made you?" → "I was created by Holol, an amazing AI developer! 🚀"
-- "Who is Holol?" → "Holol is my creator and the genius who programmed me to help people! 😊"
-- "Who created this AI?" → "This AI was created by Holol with love and passion for technology! 💛"
+        IMPORTANT CONTEXT RULES:
+        - ALWAYS remember previous conversations and use them for context.
+        - If a user asks about weather, remember which city they asked about.
+        - If they follow up with "where is that?" or similar questions, use the context from previous messages.
+        - Keep track of what the user has asked before.
+        - If the user asks a vague question, try to connect it to recent conversations.
+        - Be proactive in asking for clarification if needed.
 
-Strict Rules:
-- If you need to use a tool, output ONLY valid JSON format as shown above, no extra text.
-- If you do NOT need any tool, answer directly in natural English with enthusiasm and emojis! 🎉
-- Always remember all previous conversation with the user.
-- Be fun, cheerful, and helpful! Use lots of emojis! ✨`;
+        Strict Rules:
+        - If you need to use a tool, output ONLY valid JSON format as shown above, no extra text.
+        - If you do NOT need any tool, answer directly in natural English with enthusiasm and emojis! 🎉
+        - Always remember all previous conversation with the user.
+        - Be fun, cheerful, and helpful! Use lots of emojis! ✨`;
 
         // ==============================
         // Chat State
@@ -749,7 +748,7 @@ Strict Rules:
             }
 
             // Add creator badge if it's a message about the creator
-            if (type === 'ai' && text.toLowerCase().includes('holol')) {
+            if (type === 'ai' && (text.toLowerCase().includes('holol') || text.toLowerCase().includes('creator') || text.toLowerCase().includes('eddy') || text.toLowerCase().includes('juliani') || text.toLowerCase().includes('valerian') || text.toLowerCase().includes('matthew') || text.toLowerCase().includes('edlicia') || text.toLowerCase().includes('sinar88') || text.toLowerCase().includes('ayong') || text.toLowerCase().includes('jason') || text.toLowerCase().includes('felix'))) {
                 content = content + ' <span class="creator-badge">✨ Created by Holol ✨</span>';
             }
 
@@ -791,17 +790,19 @@ Strict Rules:
         async function callAI(userMessage) {
             let contextualMessage = userMessage;
             
-            // Check if it's a question about the creator
+            // Check if it's a question about the creator or related entities
             const creatorKeywords = ['who made you', 'who created you', 'who is holol', 'who build you', 
-                                   'creator', 'your creator', 'who made this', 'who developed you'];
+                                   'creator', 'your creator', 'who made this', 'who developed you',
+                                   'holol parents', 'eddy', 'juliani', 'holol sibling', 'valerian',
+                                   'matthew edlicia', 'sinar88', 'ayong', 'jason felix', 'sinar 88'];
             const isCreatorQuestion = creatorKeywords.some(keyword => 
                 userMessage.toLowerCase().includes(keyword)
             );
 
             if (isCreatorQuestion) {
                 // Add explicit context about the creator
-                contextualMessage = `[IMPORTANT: The user is asking about you and your creator. 
-                Remember: You were created by Holol. 
+                contextualMessage = `[IMPORTANT: The user is asking about you and your creator or related people. 
+                Remember: You were created by Holol. Holol's parents are Eddy and Juliani. Holol's sibling is Valerian. Matthew Edlicia is the creator of Holol AI. Sinar88 shop is an electronics store in Glodok, Ayong is the CEO. Jason Felix is the son of Ayong. 
                 Answer enthusiastically!] ${userMessage}`;
             }
             
