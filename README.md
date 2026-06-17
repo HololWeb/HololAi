@@ -1,2 +1,0 @@
-# HololAi
-Holol Ai
